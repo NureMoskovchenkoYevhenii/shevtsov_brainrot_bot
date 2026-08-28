@@ -66,7 +66,7 @@ async def check_updates():
         if video_id not in sent_videos:
             print(f"Обнаружено новое видео {video_id}, добавляем в список")
             sent_videos.append(video_id)
-            if True: #if not first_run:
+            if not first_run:
                 video_url = f"https://www.youtube.com/watch?v={video_id}"
                 try:
                     print(f"Отправка сообщения в группу {CHAT_ID}...")
