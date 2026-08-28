@@ -4,14 +4,8 @@ import os
 import aiohttp
 import xml.etree.ElementTree as ET
 from aiogram import Bot
-from config import BOT_TOKEN, CHAT_ID, CHANNELS, CHECK_INTERVAL
-
 from aiohttp import web
-
-async def handle_health_check(request):
-    return web.Response(text="Бот активен")
-
-
+from config import BOT_TOKEN, CHAT_ID, CHANNELS, CHECK_INTERVAL
 
 bot = Bot(token=BOT_TOKEN)
 DB_FILE = "sent_videos.json"
@@ -57,6 +51,7 @@ async def get_latest_video_id(channel_id: str) -> str:
 async def check_updates():
     print("Запуск проверки обновлений...")
     sent_videos = load_sent_videos()
+    first_run = len(sent_videos) == 0
     print(f"Загружено ранее отправленных видео: {len(sent_videos)}")
     
     for channel_id in CHANNELS:
@@ -71,7 +66,7 @@ async def check_updates():
         if video_id not in sent_videos:
             print(f"Обнаружено новое видео {video_id}, добавляем в список")
             sent_videos.append(video_id)
-            if True:  # Временный тест для принудительной отправки
+            if not first_run:
                 video_url = f"https://www.youtube.com/watch?v={video_id}"
                 try:
                     print(f"Отправка сообщения в группу {CHAT_ID}...")
@@ -84,6 +79,9 @@ async def check_updates():
             
     save_sent_videos(sent_videos)
     print("Проверка обновлений завершена. Ожидание следующего цикла...")
+
+async def handle_health_check(request):
+    return web.Response(text="Бот активен")
 
 async def main():
     app = web.Application()
