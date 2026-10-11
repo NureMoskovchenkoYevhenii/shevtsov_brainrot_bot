@@ -97,11 +97,14 @@ async def main():
 
     try:
         while True:
-            await check_updates()
+            try:
+                await check_updates()
+            except Exception as e:
+                print(f"Ошибка в цикле проверки: {e}")
             await asyncio.sleep(CHECK_INTERVAL)
     finally:
         await bot.session.close()
         await runner.cleanup()
-
+        
 if __name__ == "__main__":
     asyncio.run(main())
